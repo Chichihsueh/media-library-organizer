@@ -18,6 +18,10 @@ Use this skill when the user asks to audit, catalog, organize, identify, rename,
 - If the source is a removable or network volume, verify it is mounted and writable before planning any mutations; fail closed if unavailable.
 - Never modify or delete a source solely to make the resulting library look tidy.
 
+## Filename normalization
+
+For code-based video renaming, read `references/naming-rules.md`. Use `CODE_resolution.ext` (for example `ABC-123_480p.mp4`), preserve the extension and parent folder, and keep unresolved identifiers unchanged. The current planner does not implement this same-folder rename workflow.
+
 ## Workflow
 
 1. **Discover**: establish root, scope, output location, file extensions, volumes and exclusions. Run `scripts/inventory.py` (read-only) to produce a JSON inventory; ensure report path is outside the media tree when practical.

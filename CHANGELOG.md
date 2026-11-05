@@ -1,5 +1,13 @@
 # Changelog
 
+## Next release (known issues, deferred)
+- Recognise non-`ABC-123` catalogue formats (FC2-PPV-######, HEYZO-####, MMDDYY-NNN, 300MIUM-###); ~360 files in a real library stayed unidentified.
+- Prefix sanity check: words such as `COLLEGE-33` pass the code heuristic; compare prefixes against known labels or require verification.
+- Ship a journaled same-folder rename/flatten preview and executor (`CODE_resolution.ext`) with rollback instead of one-off scripts.
+- Warn when two files collapse to the same target name (keep originals, list for review) as `plan.py` rename mode.
+- `verify.py` is untested against the live endpoint; confirm field names on first real run and add duration comparison via ffprobe.
+- Original titles/performer names are lost on rename; keep an old-to-new mapping report by default.
+
 ## 0.1.2
 ### Fixed
 - `inventory.py`: `.rmvb`, `.rm`, `.flv`, `.mpg`, `.mpeg`, `.3gp`, `.vob`, `.divx`, `.asf` were silently skipped; found while organizing a real library (100 files missed).

@@ -1,6 +1,8 @@
 # Changelog
 
 ## 0.1.2
+### Fixed
+- `inventory.py`: `.rmvb`, `.rm`, `.flv`, `.mpg`, `.mpeg`, `.3gp`, `.vob`, `.divx`, `.asf` were silently skipped; found while organizing a real library (100 files missed).
 ### Added
 - `scripts/verify.py`: opt-in, ID-only check against r18.dev public JSON (dry run by default, delay, limit, cache, fail-closed on 429). Live endpoint behaviour is untested in CI; tests use mocked responses.
 

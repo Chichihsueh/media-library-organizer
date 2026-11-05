@@ -31,6 +31,14 @@ class TestInfer(unittest.TestCase):
 
 
 class TestInventory(unittest.TestCase):
+    def test_legacy_formats_are_inventoried(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp) / 'source'; root.mkdir()
+            for n in ('ABC-123.rmvb', 'ABC-124.rm', 'ABC-125.flv', 'ABC-126.mpg', 'note.txt'):
+                (root / n).write_bytes(b'1')
+            names = sorted(f['relative_path'] for f in inventory(root)['files'])
+            self.assertEqual(names, ['ABC-123.rmvb', 'ABC-124.rm', 'ABC-125.flv', 'ABC-126.mpg'])
+
     def test_skips_sidecars_and_nas_dirs(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp) / 'source'; root.mkdir()

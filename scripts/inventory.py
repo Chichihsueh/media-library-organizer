@@ -7,7 +7,8 @@ import os
 from pathlib import Path
 import re
 
-EXTENSIONS = {'.mp4', '.mkv', '.mov', '.avi', '.m4v', '.wmv', '.webm', '.ts'}
+EXTENSIONS = {'.mp4', '.mkv', '.mov', '.avi', '.m4v', '.wmv', '.webm', '.ts',
+              '.rmvb', '.rm', '.flv', '.mpg', '.mpeg', '.3gp', '.vob', '.divx', '.asf'}
 # Directories created by NAS/OS tooling; never contain user media worth indexing.
 SKIP_DIRS = {'#recycle', '@eadir', '.trashes', '.spotlight-v100', '.fseventsd', '$recycle.bin'}
 # Letter prefixes produced by cameras, phones and tools, not catalogue codes.

@@ -30,6 +30,8 @@ def find_code(stem):
             continue
         if int(digits) in RESOLUTIONS and not re.search(r'[-_]', stem[m.start():m.end()]):
             continue  # "ABC 720" without a separator is far more likely a resolution
+        if len(digits) >= 5 and digits.startswith('0'):
+            digits = digits.lstrip('0').zfill(3)  # DMM-style padding: club00502 -> CLUB-502
         return prefix, digits
     return None
 

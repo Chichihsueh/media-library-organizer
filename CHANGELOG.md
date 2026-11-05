@@ -10,6 +10,8 @@
 
 ## 0.1.2
 ### Fixed
+- `inventory.py`: 5+ digit zero-padded numbers (`club00502`) are normalised to 3+ digits (`CLUB-502`); a real run produced 38 wrong IDs from this, found by `verify.py`.
+### Fixed
 - `verify.py`: DMM-style content IDs (`h_1329askd00007`, `1dandy911r`) are now comparable; a 1709-ID run left 259 as unconfirmed before this.
 ### Added
 - `verify.py`: checkpoints the cache every 50 requests and saves on Ctrl-C so long runs can resume.

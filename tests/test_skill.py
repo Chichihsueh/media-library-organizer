@@ -26,6 +26,12 @@ class TestInfer(unittest.TestCase):
         self.assertEqual(infer('ABC-123_480p.mp4')['edition_clues'], ['480P'])
         self.assertEqual(infer('abc-123.4k.x265.mkv')['edition_clues'], ['4K', 'X265'])
 
+    def test_dmm_padding_is_normalised(self):
+        self.assertEqual(infer('club00502.mp4')['work_id'], 'CLUB-502')
+        self.assertEqual(infer('HOMA-00030.mp4')['work_id'], 'HOMA-030')
+        self.assertEqual(infer('bdst06701.mp4')['work_id'], 'BDST-6701')
+        self.assertEqual(infer('ABC-0007.mp4')['work_id'], 'ABC-0007')
+
     def test_leading_zeros_kept(self):
         self.assertEqual(infer('abc-007_1080p.mp4')['work_id'], 'ABC-007')
 

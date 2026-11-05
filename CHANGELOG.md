@@ -9,6 +9,8 @@
 - Original titles/performer names are lost on rename; keep an old-to-new mapping report by default.
 
 ## 0.1.2
+### Added
+- `verify.py`: checkpoints the cache every 50 requests and saves on Ctrl-C so long runs can resume.
 ### Fixed
 - `verify.py`: first live run showed the dvd_id endpoint can omit `dvd_id`; the ID is now derived from `content_id` (`118ama00027` -> AMA-027), with a new `unconfirmed` status. Runtime still needs the `combined=` endpoint (next release).
 ### Fixed

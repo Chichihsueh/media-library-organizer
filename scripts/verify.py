@@ -64,7 +64,7 @@ def classify(work_id, status, body):
     return {'status': 'mismatch', 'detail': 'content_id points to a different ID', **rec}
 
 
-def verify(ids, fetch=fetch_json, cache=None, delay=1.0, limit=50, sleep=time.sleep):
+def verify(ids, fetch=fetch_json, cache=None, delay=1.0, limit=50, sleep=time.sleep, on_progress=None):
     cache = {} if cache is None else cache
     results, sent = {}, 0
     for work_id in ids:
@@ -83,6 +83,7 @@ def verify(ids, fetch=fetch_json, cache=None, delay=1.0, limit=50, sleep=time.sl
                 res = {'status': 'error', 'detail': type(exc).__name__}
             results[work_id] = res
             if res['status'] != 'error': cache[work_id] = res
+            if on_progress and sent % 50 == 0: on_progress(sent, len(ids))
             if res['detail'] == 'HTTP 429':  # fail closed: stop hammering a rate-limiting service
                 break
     return results, sent
@@ -107,10 +108,17 @@ def main():
         return
     cache_path = Path(args.cache).expanduser() if args.cache else None
     cache = json.loads(cache_path.read_text(encoding='utf-8')) if cache_path and cache_path.exists() else {}
-    results, sent = verify(ids, cache=cache, delay=max(args.delay, 0.5), limit=args.limit)
-    if cache_path:
-        tmp = cache_path.with_suffix('.tmp'); tmp.write_text(json.dumps(cache, ensure_ascii=False, indent=2), encoding='utf-8')
-        tmp.replace(cache_path)
+    def save_cache():
+        if cache_path:
+            tmp = cache_path.with_suffix('.tmp')
+            tmp.write_text(json.dumps(cache, ensure_ascii=False, indent=2), encoding='utf-8'); tmp.replace(cache_path)
+    def progress(sent, total):
+        save_cache(); print(f'  ... {sent} requests sent ({len(cache)} cached of {total} IDs)', flush=True)
+    try:
+        results, sent = verify(ids, cache=cache, delay=max(args.delay, 0.5), limit=args.limit, on_progress=progress)
+    except KeyboardInterrupt:
+        save_cache(); sys.exit('Interrupted: progress saved to cache; re-run the same command to resume.')
+    save_cache()
     summary = {k: sum(r['status'] == k for r in results.values())
                for k in ('id_match', 'mismatch', 'unconfirmed', 'not_found', 'error', 'skipped')}
     report = {'schema_version': SCHEMA_VERSION, 'source': 'r18.dev', 'requests_sent': sent,

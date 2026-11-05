@@ -32,6 +32,13 @@ class TestVerify(unittest.TestCase):
         res, sent = verify(['AAA-111', 'BBB-222'], fetch=lambda i: (429, None), sleep=lambda s: None)
         self.assertEqual(sent, 1); self.assertNotIn('BBB-222', res)
 
+    def test_progress_callback_every_50(self):
+        ticks = []
+        ids = [f'AAA-{i:03d}' for i in range(100, 160)]
+        verify(ids, fetch=lambda i: (200, {'dvd_id': i}), limit=60, sleep=lambda s: None,
+               on_progress=lambda sent, total: ticks.append(sent))
+        self.assertEqual(ticks, [50])
+
     def test_fetch_refuses_unvalidated_id(self):
         with self.assertRaises(ValueError): fetch_json('../etc/passwd')
 

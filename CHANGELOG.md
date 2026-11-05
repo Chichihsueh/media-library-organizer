@@ -10,6 +10,8 @@
 
 ## 0.1.2
 ### Fixed
+- `verify.py`: first live run showed the dvd_id endpoint can omit `dvd_id`; the ID is now derived from `content_id` (`118ama00027` -> AMA-027), with a new `unconfirmed` status. Runtime still needs the `combined=` endpoint (next release).
+### Fixed
 - `inventory.py`: `.rmvb`, `.rm`, `.flv`, `.mpg`, `.mpeg`, `.3gp`, `.vob`, `.divx`, `.asf` were silently skipped; found while organizing a real library (100 files missed).
 ### Added
 - `scripts/verify.py`: opt-in, ID-only check against r18.dev public JSON (dry run by default, delay, limit, cache, fail-closed on 429). Live endpoint behaviour is untested in CI; tests use mocked responses.

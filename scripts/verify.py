@@ -36,6 +36,12 @@ def fetch_json(work_id, timeout=10):
         return exc.code, None
 
 
+def id_from_content(content_id):
+    """'118ama00027' -> ('AMA', 27). None when the content_id has an unusual shape."""
+    m = re.fullmatch(r'\d{0,3}([a-z]{2,8})0*(\d{1,7})', str(content_id or '').lower())
+    return (m.group(1).upper(), int(m.group(2))) if m else None
+
+
 def classify(work_id, status, body):
     if status == 429 or (status and status >= 500):
         return {'status': 'error', 'detail': f'HTTP {status}'}
@@ -44,9 +50,18 @@ def classify(work_id, status, body):
     returned = body.get('dvd_id') or body.get('dvdId')
     rec = {'returned_id': returned, 'content_id': body.get('content_id'),
            'release_date': body.get('release_date'), 'runtime_mins': body.get('runtime_mins')}
-    if norm(returned) == norm(work_id):
-        return {'status': 'id_match', 'detail': 'service returned the same ID', **rec}
-    return {'status': 'mismatch', 'detail': 'service returned a different ID', **rec}
+    if returned:
+        if norm(returned) == norm(work_id):
+            return {'status': 'id_match', 'detail': 'service returned the same ID', **rec}
+        return {'status': 'mismatch', 'detail': 'service returned a different ID', **rec}
+    # The dvd_id lookup may omit dvd_id; derive the ID from content_id instead.
+    derived = id_from_content(body.get('content_id'))
+    label, _, number = work_id.partition('-')
+    if derived is None:
+        return {'status': 'unconfirmed', 'detail': 'record found but ID not comparable', **rec}
+    if derived == (label, int(number)):
+        return {'status': 'id_match', 'detail': 'matched via content_id', **rec}
+    return {'status': 'mismatch', 'detail': 'content_id points to a different ID', **rec}
 
 
 def verify(ids, fetch=fetch_json, cache=None, delay=1.0, limit=50, sleep=time.sleep):
@@ -97,7 +112,7 @@ def main():
         tmp = cache_path.with_suffix('.tmp'); tmp.write_text(json.dumps(cache, ensure_ascii=False, indent=2), encoding='utf-8')
         tmp.replace(cache_path)
     summary = {k: sum(r['status'] == k for r in results.values())
-               for k in ('id_match', 'mismatch', 'not_found', 'error', 'skipped')}
+               for k in ('id_match', 'mismatch', 'unconfirmed', 'not_found', 'error', 'skipped')}
     report = {'schema_version': SCHEMA_VERSION, 'source': 'r18.dev', 'requests_sent': sent,
               'summary': summary, 'results': results,
               'note': 'id_match does not prove the local file is that work; confirm duration/title before renaming.'}

@@ -9,6 +9,11 @@ class TestVerify(unittest.TestCase):
         self.assertEqual(classify('ABC-123', 404, None)['status'], 'not_found')
         self.assertEqual(classify('ABC-123', 503, None)['status'], 'error')
 
+    def test_classify_via_content_id(self):
+        self.assertEqual(classify('AMA-027', 200, {'content_id': '118ama00027'})['status'], 'id_match')
+        self.assertEqual(classify('AMA-027', 200, {'content_id': '118ama00028'})['status'], 'mismatch')
+        self.assertEqual(classify('ABC-123', 200, {'content_id': 'h_068abc00123'})['status'], 'unconfirmed')
+
     def test_only_valid_ids_are_sent_and_cached(self):
         calls, cache = [], {}
         def fake(i):

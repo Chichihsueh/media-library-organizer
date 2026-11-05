@@ -37,8 +37,8 @@ def fetch_json(work_id, timeout=10):
 
 
 def id_from_content(content_id):
-    """'118ama00027' -> ('AMA', 27). None when the content_id has an unusual shape."""
-    m = re.fullmatch(r'\d{0,3}([a-z]{2,8})0*(\d{1,7})', str(content_id or '').lower())
+    """'118ama00027' / 'h_1329askd00007' / '1dandy911r' -> (LABEL, number); None for unusual shapes."""
+    m = re.fullmatch(r'(?:[a-z]_)?\d{0,5}([a-z]{2,8})0*(\d{1,7})[a-z]?', str(content_id or '').lower())
     return (m.group(1).upper(), int(m.group(2))) if m else None
 
 

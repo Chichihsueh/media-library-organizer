@@ -9,6 +9,8 @@
 - Original titles/performer names are lost on rename; keep an old-to-new mapping report by default.
 
 ## 0.1.2
+### Fixed
+- `verify.py`: DMM-style content IDs (`h_1329askd00007`, `1dandy911r`) are now comparable; a 1709-ID run left 259 as unconfirmed before this.
 ### Added
 - `verify.py`: checkpoints the cache every 50 requests and saves on Ctrl-C so long runs can resume.
 ### Fixed

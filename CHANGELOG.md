@@ -1,0 +1,19 @@
+# Changelog
+
+## 0.1.1
+### Fixed
+- `inventory.py`: `ABC 1080p` was read as work ID `ABC-1080`; resolutions are no longer codes.
+- `inventory.py`: camera/phone names (`IMG_0045`, `DSC_0012`, `PXL_*`) are no longer treated as codes.
+- `inventory.py`: macOS `._*` sidecars and NAS folders (`#recycle`, `@eaDir`) are skipped.
+- `inventory.py`: `480p`, `576p`, `360p`, `8k`, `x264/x265` are now recognised as edition clues.
+- `plan.py`: files modified after the scan (size or mtime differs) are reported as conflicts.
+
+### Added
+- `plan.py` schema v2: `warnings` (cross-volume destination), `review_groups`, per-file `evidence`.
+- Tests for the above (12 total) and a GitHub Actions workflow.
+
+### Changed
+- `SKILL.md` description rewritten with explicit "use when" triggers.
+
+## 0.1.0
+- Initial read-only inventory and preview planner.

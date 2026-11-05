@@ -5,9 +5,10 @@ A safety-first, open-source Agent Skill for **inventorying, identifying, groupin
 ## What it does
 
 - Read-only local media inventory (paths, sizes, timestamps, filename-based work IDs, part and edition clues)
-- Conservative grouping heuristics with unknowns kept unresolved
-- Generates a JSON **dry-run** plan for per-work folders
-- Reports collisions and skips; never silently overwrites
+- Skips macOS `._*` sidecars, symlinks and NAS system folders; ignores resolutions and camera names when guessing IDs
+- Conservative grouping: `review_groups` lists multi-version and multi-part works, never as proof of duplicates
+- Generates a JSON **dry-run** plan for per-work folders with evidence per file
+- Reports collisions, files changed since the scan, and cross-volume destinations; never silently overwrites
 - Includes tests and agent instructions in `SKILL.md`
 
 ## What it does NOT do

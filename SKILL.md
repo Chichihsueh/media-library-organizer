@@ -1,11 +1,11 @@
 ---
 name: media-library-organizer
-description: Safely inventory, identify, group and plan organization of local video libraries using filename clues, metadata, NFO and optional ffprobe. Default to read-only. Generate reviewable plans before any physical file changes.
+description: Use when the user wants to audit, catalog, identify, group, rename or deduplicate local or mounted video libraries (NAS, external drives). Read-only by default; builds an inventory and a reviewable preview plan from filename clues, and never moves, renames or deletes files without explicit approval of a specific plan.
 ---
 
 # Media Library Organizer
 
-Use this skill when the user asks to audit, catalog, organize, identify, rename, group or deduplicate video collections on local or mounted storage.
+Use this skill when the user asks to audit, catalog, organize, identify, rename, group or deduplicate video collections on local or mounted storage. For anything that would change files, stop at the plan and ask.
 
 ## Non-negotiable safeguards
 
@@ -35,18 +35,20 @@ For code-based video renaming, read `references/naming-rules.md`. Use `CODE_reso
 
 ## Commands
 
+Run from the skill folder. Python 3.9+, standard library only. Pick an output path outside the media tree.
+
 ```bash
 python3 scripts/inventory.py "/path/to/Media" --output inventory.json
 python3 scripts/plan.py inventory.json --destination "/path/to/Organized" --output plan.json
 python3 -m unittest discover -s tests -v
 ```
 
-The inventory enumerates filenames and metadata, but does not calculate hashes or verify media content. `plan.py` generates a preview only, intentionally refuses to plan when output destination is inside the scanned source, and flags existing destination collisions. Do not interpret these commands as organizing files.
+The inventory enumerates filenames and metadata, but does not calculate hashes or verify media content. It skips macOS `._*` sidecars, symlinks and NAS system folders (`#recycle`, `@eaDir`), and ignores resolutions (`ABC 1080p`) and camera names (`IMG_0045`) when guessing codes. `plan.py` generates a preview only. It refuses overlapping source/destination trees, flags collisions, flags files whose size or mtime changed since the scan (re-scan first), warns when the destination is on another volume, and lists `review_groups` (multi-version or multi-part works). Do not interpret these commands as organizing files.
 
 ## Reports
 
 - Inventory: source root, time (UTC), file list, tentative work IDs, byte sizes, path, part and edition clues, errors.
-- Plan: every proposed source/destination, status (`proposed`, `skipped`, `conflict`), warnings, and summary.
+- Plan (schema v2): every proposed source/destination with evidence, status (`proposed`, `skipped`, `conflict`), `warnings`, `review_groups` and summary.
 - Always distinguish verified facts, filename heuristics, and user-supplied metadata.
 
 ## References

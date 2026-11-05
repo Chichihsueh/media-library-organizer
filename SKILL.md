@@ -27,6 +27,7 @@ For code-based video renaming, read `references/naming-rules.md`. Use `CODE_reso
 1. **Discover**: establish root, scope, output location, file extensions, volumes and exclusions. Run `scripts/inventory.py` (read-only) to produce a JSON inventory; ensure report path is outside the media tree when practical.
 2. **Identify**: derive tentative title/identifier/part/edition from names. Preserve source filename as ground truth and record confidence and evidence. Unknown remains unknown.
 3. **Enrich**: optionally use colocated `.nfo` or `ffprobe`, subject to availability and user consent. Preserve human-authored values. Keep provenance and conflicts; do not silently override.
+   For an online ID check (only with the user's explicit consent), run `scripts/verify.py` (see Commands). It sends only the ID, never filenames or paths, and a match is evidence, not proof.
 4. **Reconcile**: group files by conservative identifier. A shared identifier indicates a work relationship, not identical content. Partition versions/parts and mark ambiguous groups for review.
 5. **Plan**: run `scripts/plan.py` to generate a JSON preview of *proposed* same-volume moves. Inspect collisions, unresolved works, unexpected paths, permission and free-space considerations; do not apply automatically.
 6. **Review**: explain destination rules and enumerate proposed changes, skips, conflicts and unknowns. Obtain explicit approval for the specific plan before any file changes.
@@ -40,6 +41,8 @@ Run from the skill folder. Python 3.9+, standard library only. Pick an output pa
 ```bash
 python3 scripts/inventory.py "/path/to/Media" --output inventory.json
 python3 scripts/plan.py inventory.json --destination "/path/to/Organized" --output plan.json
+python3 scripts/verify.py inventory.json --output verify.json                      # dry run: lists IDs that would be sent
+python3 scripts/verify.py inventory.json --output verify.json --online --cache cache.json  # opt-in network
 python3 -m unittest discover -s tests -v
 ```
 

@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.2
+### Added
+- `scripts/verify.py`: opt-in, ID-only check against r18.dev public JSON (dry run by default, delay, limit, cache, fail-closed on 429). Live endpoint behaviour is untested in CI; tests use mocked responses.
+
 ## 0.1.1
 ### Fixed
 - `inventory.py`: `ABC 1080p` was read as work ID `ABC-1080`; resolutions are no longer codes.

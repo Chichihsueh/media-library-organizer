@@ -13,7 +13,7 @@ A safety-first, open-source Agent Skill for **inventorying, identifying, groupin
 
 ## What it does NOT do
 
-- No automatic file moves, renames, deletes, hashing or network scraping
+- No automatic file moves, renames, deletes or hashing. Network use is limited to the opt-in `verify.py` ID check
 - No automatic metadata-provider integration or NFO/ffprobe parsing in this first version
 - No guaranteed identity/deduplication detection
 - No execution engine or rollback implementation (design guidance only)
@@ -25,8 +25,11 @@ Python 3.9+ (standard library only):
 ```sh
 python3 scripts/inventory.py "/path/to/Media" --output inventory.json
 python3 scripts/plan.py inventory.json --destination "/path/to/Organized" --output plan.json
+python3 scripts/verify.py inventory.json --output verify.json   # dry run; add --online to query r18.dev
 python3 -m unittest discover -s tests -v
 ```
+
+`verify.py` sends only IDs (no filenames/paths), with delay, request limit, cache, and stops on HTTP 429. A match does not prove a file's identity; also compare duration and title.
 
 Reports include full local paths; keep them private. The source and destination must be separate folder trees. No original media is modified.
 

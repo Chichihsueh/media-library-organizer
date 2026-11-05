@@ -35,6 +35,32 @@ class TestInfer(unittest.TestCase):
     def test_leading_zeros_kept(self):
         self.assertEqual(infer('abc-007_1080p.mp4')['work_id'], 'ABC-007')
 
+    def test_padded_number_is_not_a_resolution(self):
+        self.assertEqual(infer('ssni00360.mp4')['work_id'], 'SSNI-360')
+
+    def test_labelled_formats(self):
+        cases = {
+            'fc2-911944_hd.mp4': 'FC2-PPV-911944',
+            'FC2-PPV-1234567.mp4': 'FC2-PPV-1234567',
+            '(Heyzo)(1883)title.mp4': 'HEYZO-1883',
+            '020217-365-CARIB-1080p.mp4': 'CARIB-020217-365',
+            '011714_749-caribpr-low.wmv': 'CARIBPR-011714-749',
+            '111018_767-1pon-1080p.mp4': '1PON-111018-767',
+            '200GANA-1765.mp4': '200GANA-1765',
+            '300mium_1248_g.mp4': '300MIUM-1248',
+            'Caribbeancompr050416_557x.mp4': 'CARIBPR-050416-557',
+            'caribbeancom-031516_117.mp4': 'CARIB-031516-117',
+        }
+        for name, expected in cases.items():
+            got = infer(name)
+            self.assertEqual(got['work_id'], expected, name)
+            self.assertEqual(got['id_confidence'], 'labelled', name)
+
+    def test_unlabelled_dates_and_noise_are_not_codes(self):
+        for name in ('122619_226.mp4', '318628-full.mp4', 'x264-100.mp4', 'movie 720p.mp4',
+                     'h_172hdm00001pl.mp4'):
+            self.assertIsNone(infer(name)['work_id'], name)
+
 
 class TestInventory(unittest.TestCase):
     def test_legacy_formats_are_inventoried(self):
@@ -70,6 +96,14 @@ class TestPlan(unittest.TestCase):
             self.assertEqual(len(list(root.iterdir())), 2)
             with self.assertRaises(ValueError): plan(data, root / 'organized')
             with self.assertRaises(ValueError): plan(data, root.parent)
+
+    def test_labelled_ids_are_planned(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp) / 'source'; root.mkdir()
+            (root / '200GANA-073.mp4').write_bytes(b'1')
+            (root / 'fc2-911944_hd.mp4').write_bytes(b'2')
+            summary = plan(inventory(root), Path(tmp) / 'dest')['summary']
+            self.assertEqual(summary, {'proposed': 2, 'skipped': 0, 'conflict': 0})
 
     def test_collision(self):
         with tempfile.TemporaryDirectory() as tmp:

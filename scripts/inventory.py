@@ -16,8 +16,37 @@ NON_CODE_PREFIXES = {'IMG', 'DSC', 'DSCN', 'DSCF', 'PXL', 'VID', 'MOV', 'MVI', '
                      'WA', 'SCREEN', 'REC', 'CLIP', 'PART', 'DISC', 'CD', 'PT', 'EP', 'SEASON', 'TRACK'}
 RESOLUTIONS = {360, 480, 540, 576, 720, 1080, 1440, 2160, 4320}
 CODE = re.compile(r'(?<![a-z0-9])([a-z]{2,8})[-_ ]?(\d{2,7})(?!\d)([pik])?', re.I)
+# Explicitly labelled formats that the generic LETTERS-DIGITS pattern cannot express.
+FC2 = re.compile(r'(?<![a-z0-9])fc2[-_ ]?(?:ppv[-_ ]?)?(\d{6,8})(?!\d)', re.I)
+HEYZO = re.compile(r'(?<![a-z0-9])heyzo\W*(?:hd\W*)?(\d{4})(?!\d)', re.I)
+DATED = re.compile(r'(?<!\d)(\d{6})[-_](\d{3})(?!\d)')
+DATED_LABELS = (('caribbeancompr', 'CARIBPR'), ('caribpr', 'CARIBPR'), ('carib', 'CARIB'), ('1pon', '1PON'), ('10mu', '10MU'),
+                ('pacopacomama', 'PACO'), ('paco', 'PACO'))
+# Studio-prefixed codes such as 200GANA-073 or 259LUXU-1014 (three digits then 3-8 letters).
+STUDIO = re.compile(r'(?<![a-z0-9])(\d{3})([a-z]{3,8})[-_ ]?(\d{2,4})(?!\d)', re.I)
 PART = re.compile(r'(?:^|[\s._-])(?:cd|part|pt|disc)[\s._-]?(\d{1,2})(?:$|[\s._-])', re.I)
 EDITION = re.compile(r'(?<![a-z0-9])(4320p|2160p|1440p|1080[pi]|720p|576p|540p|480p|360p|8k|4k|hevc|h\.?265|h\.?264|x265|x264)(?![a-z0-9])', re.I)
+
+
+def find_labelled(stem):
+    """Codes whose label is spelled out in the name (FC2, HEYZO, dated uncensored sites, studio prefix)."""
+    m = FC2.search(stem)
+    if m:
+        return f'FC2-PPV-{m.group(1)}'
+    m = HEYZO.search(stem)
+    if m:
+        return f'HEYZO-{m.group(1)}'
+    low = stem.lower()
+    for key, label in DATED_LABELS:
+        if key in low:
+            m = DATED.search(stem)
+            if m:  # a bare date-like number without a site label is never accepted
+                return f'{label}-{m.group(1)}-{m.group(2)}'
+            break
+    for m in STUDIO.finditer(stem):
+        if m.group(2).upper() not in NON_CODE_PREFIXES:
+            return f'{m.group(1)}{m.group(2).upper()}-{m.group(3)}'
+    return None
 
 
 def find_code(stem):
@@ -28,7 +57,7 @@ def find_code(stem):
             continue
         if suffix and int(digits) in RESOLUTIONS:  # e.g. "ABC 1080p"
             continue
-        if int(digits) in RESOLUTIONS and not re.search(r'[-_]', stem[m.start():m.end()]):
+        if len(digits) <= 4 and int(digits) in RESOLUTIONS and not re.search(r'[-_]', stem[m.start():m.end()]):
             continue  # "ABC 720" without a separator is far more likely a resolution
         if len(digits) >= 5 and digits.startswith('0'):
             digits = digits.lstrip('0').zfill(3)  # DMM-style padding: club00502 -> CLUB-502
@@ -38,11 +67,13 @@ def find_code(stem):
 
 def infer(name):
     stem = Path(name).stem
-    m = find_code(stem)
+    labelled = find_labelled(stem)
+    m = None if labelled else find_code(stem)
     p = PART.search(' ' + stem + ' ')
     editions = sorted({x.upper() for x in EDITION.findall(stem)})
-    return {'work_id': f'{m[0]}-{m[1]}' if m else None,
-            'id_confidence': 'heuristic' if m else 'unknown',
+    work_id = labelled or (f'{m[0]}-{m[1]}' if m else None)
+    return {'work_id': work_id,
+            'id_confidence': 'labelled' if labelled else ('heuristic' if m else 'unknown'),
             'part': int(p.group(1)) if p else None, 'edition_clues': editions}
 
 

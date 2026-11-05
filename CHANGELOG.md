@@ -1,7 +1,13 @@
 # Changelog
 
+## 0.1.3 (unreleased, local branch optimize/v0.1.3)
+### Added
+- `inventory.py`: explicitly labelled formats (`FC2-PPV-######`, `HEYZO-####`, `CARIB|CARIBPR|1PON|10MU|PACO-MMDDYY-NNN`, studio-prefixed `200GANA-073`) with `id_confidence: "labelled"`. Bare date-like numbers without a site label are never accepted.
+- `plan.py`: accepts the above formats in `SAFE_ID`; `verify.py` still skips them (r18.dev does not cover them), so no request is sent.
+### Fixed
+- `inventory.py`: zero-padded numbers such as `ssni00360` were dropped as a "360p resolution".
+
 ## Next release (known issues, deferred)
-- Recognise non-`ABC-123` catalogue formats (FC2-PPV-######, HEYZO-####, MMDDYY-NNN, 300MIUM-###); ~360 files in a real library stayed unidentified.
 - Prefix sanity check: words such as `COLLEGE-33` pass the code heuristic; compare prefixes against known labels or require verification.
 - Ship a journaled same-folder rename/flatten preview and executor (`CODE_resolution.ext`) with rollback instead of one-off scripts.
 - Warn when two files collapse to the same target name (keep originals, list for review) as `plan.py` rename mode.

@@ -50,6 +50,8 @@ class TestInfer(unittest.TestCase):
             '300mium_1248_g.mp4': '300MIUM-1248',
             'Caribbeancompr050416_557x.mp4': 'CARIBPR-050416-557',
             'caribbeancom-031516_117.mp4': 'CARIB-031516-117',
+            '010611_01-10mu.mkv-480p.mp4': '10MU-010611-01',
+            '(FC2)(697841)title.mp4': 'FC2-PPV-697841',
         }
         for name, expected in cases.items():
             got = infer(name)
@@ -58,7 +60,8 @@ class TestInfer(unittest.TestCase):
 
     def test_unlabelled_dates_and_noise_are_not_codes(self):
         for name in ('122619_226.mp4', '318628-full.mp4', 'x264-100.mp4', 'movie 720p.mp4',
-                     'h_172hdm00001pl.mp4'):
+                     'h_172hdm00001pl.mp4', '010611_01-carib.mp4', 'Dark_porno_Private_Fucking_480.mp4',
+                     'XNXX_milfs_360p.mp4'):
             self.assertIsNone(infer(name)['work_id'], name)
 
 

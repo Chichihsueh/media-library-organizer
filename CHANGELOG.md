@@ -4,7 +4,9 @@
 ### Added
 - `inventory.py`: explicitly labelled formats (`FC2-PPV-######`, `HEYZO-####`, `CARIB|CARIBPR|1PON|10MU|PACO-MMDDYY-NNN`, studio-prefixed `200GANA-073`) with `id_confidence: "labelled"`. Bare date-like numbers without a site label are never accepted.
 - `plan.py`: accepts the above formats in `SAFE_ID`; `verify.py` still skips them (r18.dev does not cover them), so no request is sent.
+- `inventory.py`: `10MU-MMDDYY-NN` (two-digit tail) and bracketed `(FC2)(697841)`.
 ### Fixed
+- `inventory.py`: site names and plain English words (`FUCKING-480`, `XNXX`, `PORNHUB`, `COLLEGE-33`) are no longer accepted as catalogue prefixes (prefix stoplist; found on an 8,120-file library).
 - `inventory.py`: zero-padded numbers such as `ssni00360` were dropped as a "360p resolution".
 
 ## Next release (known issues, deferred)

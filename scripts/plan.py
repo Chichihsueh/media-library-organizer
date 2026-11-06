@@ -6,8 +6,8 @@ from collections import defaultdict
 from pathlib import Path
 import re
 
-SAFE_ID = re.compile(r'^(?:[A-Z]{2,8}-\d{2,7}|\d{3}[A-Z]{3,8}-\d{2,4}|FC2-PPV-\d{6,8}|HEYZO-\d{4}'
-                     r'|(?:CARIBPR|CARIB|1PON|10MU|PACO)-\d{6}-\d{3})$')
+SAFE_ID = re.compile(r'^(?:[A-Z]{2,8}-\d{2,7}|\d{3}[A-Z]{3,8}-\d{2,4}|FC2-PPV-\d{6,7}|HEYZO-\d{4}'
+                     r'|(?:CARIBPR|CARIB|1PON|PACO)-\d{6}-\d{3}|10MU-\d{6}-\d{2,3})$')
 SCHEMA_VERSION = 2
 
 

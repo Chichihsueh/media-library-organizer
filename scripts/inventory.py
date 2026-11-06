@@ -14,12 +14,18 @@ SKIP_DIRS = {'#recycle', '@eadir', '.trashes', '.spotlight-v100', '.fseventsd', 
 # Letter prefixes produced by cameras, phones and tools, not catalogue codes.
 NON_CODE_PREFIXES = {'IMG', 'DSC', 'DSCN', 'DSCF', 'PXL', 'VID', 'MOV', 'MVI', 'MAH', 'GOPR', 'GP',
                      'WA', 'SCREEN', 'REC', 'CLIP', 'PART', 'DISC', 'CD', 'PT', 'EP', 'SEASON', 'TRACK'}
+# Site names and plain English words that precede a number but are not catalogue labels
+# (e.g. "Fucking_480", "Pornhub-1080"); a real library produced FUCKING-480 from this.
+WORD_PREFIXES = {'FUCKING', 'FUCK', 'PORNHUB', 'XNXX', 'XVIDEOS', 'YOUPORN', 'REDTUBE', 'HOMEMADE',
+                 'GANGBANG', 'ORGASM', 'SCANDAL', 'SHOULDER', 'REWARD', 'PRIVATE', 'FETISH', 'EROTICA',
+                 'MATTERS', 'COLLEGE', 'TEENS', 'TEEN', 'ASIAN', 'JAPANESE', 'CHINESE', 'MASSAGE',
+                 'TELEGRAM', 'WHATSAPP', 'SCREENSHOT', 'VIDEO', 'VIDEOS', 'MOVIE', 'FILE'}
 RESOLUTIONS = {360, 480, 540, 576, 720, 1080, 1440, 2160, 4320}
 CODE = re.compile(r'(?<![a-z0-9])([a-z]{2,8})[-_ ]?(\d{2,7})(?!\d)([pik])?', re.I)
 # Explicitly labelled formats that the generic LETTERS-DIGITS pattern cannot express.
-FC2 = re.compile(r'(?<![a-z0-9])fc2[-_ ]?(?:ppv[-_ ]?)?(\d{6,8})(?!\d)', re.I)
+FC2 = re.compile(r'(?<![a-z0-9])fc2\W*(?:ppv\W*)?(\d{6,7})(?!\d)', re.I)
 HEYZO = re.compile(r'(?<![a-z0-9])heyzo\W*(?:hd\W*)?(\d{4})(?!\d)', re.I)
-DATED = re.compile(r'(?<!\d)(\d{6})[-_](\d{3})(?!\d)')
+DATED = re.compile(r'(?<!\d)(\d{6})[-_](\d{2,3})(?!\d)')
 DATED_LABELS = (('caribbeancompr', 'CARIBPR'), ('caribpr', 'CARIBPR'), ('carib', 'CARIB'), ('1pon', '1PON'), ('10mu', '10MU'),
                 ('pacopacomama', 'PACO'), ('paco', 'PACO'))
 # Studio-prefixed codes such as 200GANA-073 or 259LUXU-1014 (three digits then 3-8 letters).
@@ -40,7 +46,8 @@ def find_labelled(stem):
     for key, label in DATED_LABELS:
         if key in low:
             m = DATED.search(stem)
-            if m:  # a bare date-like number without a site label is never accepted
+            if m and (len(m.group(2)) == 3 or label == '10MU'):  # only 10musume uses two digits
+                # a bare date-like number without a site label is never accepted
                 return f'{label}-{m.group(1)}-{m.group(2)}'
             break
     for m in STUDIO.finditer(stem):
@@ -53,7 +60,7 @@ def find_code(stem):
     """First plausible catalogue code; skips resolutions, camera names and lone-prefix noise."""
     for m in CODE.finditer(stem):
         prefix, digits, suffix = m.group(1).upper(), m.group(2), m.group(3)
-        if prefix in NON_CODE_PREFIXES:
+        if prefix in NON_CODE_PREFIXES or prefix in WORD_PREFIXES:
             continue
         if suffix and int(digits) in RESOLUTIONS:  # e.g. "ABC 1080p"
             continue

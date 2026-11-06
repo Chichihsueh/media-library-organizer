@@ -52,6 +52,10 @@ class TestInfer(unittest.TestCase):
             'caribbeancom-031516_117.mp4': 'CARIB-031516-117',
             '010611_01-10mu.mkv-480p.mp4': '10MU-010611-01',
             '(FC2)(697841)title.mp4': 'FC2-PPV-697841',
+            'fc2ppv_1025271.mp4-480p.mp4': 'FC2-PPV-1025271',
+            'fc2ppv_1110183-A.mp4-720p.mp4': 'FC2-PPV-1110183',
+            '112417 544 carib.mp4': 'CARIB-112417-544',
+            '10mu 032311 01.mp4': '10MU-032311-01',
         }
         for name, expected in cases.items():
             got = infer(name)

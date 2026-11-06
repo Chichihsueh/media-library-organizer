@@ -23,9 +23,9 @@ WORD_PREFIXES = {'FUCKING', 'FUCK', 'PORNHUB', 'XNXX', 'XVIDEOS', 'YOUPORN', 'RE
 RESOLUTIONS = {360, 480, 540, 576, 720, 1080, 1440, 2160, 4320}
 CODE = re.compile(r'(?<![a-z0-9])([a-z]{2,8})[-_ ]?(\d{2,7})(?!\d)([pik])?', re.I)
 # Explicitly labelled formats that the generic LETTERS-DIGITS pattern cannot express.
-FC2 = re.compile(r'(?<![a-z0-9])fc2\W*(?:ppv\W*)?(\d{6,7})(?!\d)', re.I)
+FC2 = re.compile(r'(?<![a-z0-9])fc2[\W_]*(?:ppv[\W_]*)?(\d{6,7})(?!\d)', re.I)
 HEYZO = re.compile(r'(?<![a-z0-9])heyzo\W*(?:hd\W*)?(\d{4})(?!\d)', re.I)
-DATED = re.compile(r'(?<!\d)(\d{6})[-_](\d{2,3})(?!\d)')
+DATED = re.compile(r'(?<!\d)(\d{6})[-_ ](\d{2,3})(?!\d)')
 DATED_LABELS = (('caribbeancompr', 'CARIBPR'), ('caribpr', 'CARIBPR'), ('carib', 'CARIB'), ('1pon', '1PON'), ('10mu', '10MU'),
                 ('pacopacomama', 'PACO'), ('paco', 'PACO'))
 # Studio-prefixed codes such as 200GANA-073 or 259LUXU-1014 (three digits then 3-8 letters).
